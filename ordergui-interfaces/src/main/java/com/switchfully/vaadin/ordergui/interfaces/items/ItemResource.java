@@ -21,6 +21,4 @@ public class ItemResource {
         Item[] items = restTemplate.getForObject("http://localhost:9000/items", Item[].class);
         return Arrays.asList(items);
     }
-
-
 }

@@ -1,5 +1,7 @@
 package com.switchfully.vaadin.ordergui.interfaces.customers;
 
+import com.switchfully.vaadin.ordergui.interfaces.items.Item;
+import com.switchfully.vaadin.ordergui.interfaces.items.ItemResource;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
