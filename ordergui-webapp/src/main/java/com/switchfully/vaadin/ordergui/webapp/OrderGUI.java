@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 public class OrderGUI extends UI {
 
     public static final String VIEW_ORDER_HOME = "";
+    public static final String VIEW_CREATE_ITEM = "create";
+    public static final String PICTURES_PATH = "C:/Users/7515770/switchfully-repositories/codelabs/vaadin/order-gui/order-gui-skeleton/pictures";
 
     private ItemResource itemResource;
     private Navigator navigator;
@@ -34,8 +36,8 @@ public class OrderGUI extends UI {
     protected void init(VaadinRequest request) {
         navigator = new Navigator(this, this);
 
-//        navigator.addView(VIEW_ORDER_HOME, new SearchItemView(itemResource));
-        navigator.addView(VIEW_ORDER_HOME, new CreateItemView());
+        navigator.addView(VIEW_ORDER_HOME, new SearchItemView(itemResource));
+        navigator.addView(VIEW_CREATE_ITEM, new CreateItemView(itemResource));
     }
 
 }
