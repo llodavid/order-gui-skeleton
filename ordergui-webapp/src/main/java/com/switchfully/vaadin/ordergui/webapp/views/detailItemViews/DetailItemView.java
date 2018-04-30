@@ -1,4 +1,4 @@
-package com.switchfully.vaadin.ordergui.webapp.views;
+package com.switchfully.vaadin.ordergui.webapp.views.detailItemViews;
 
 import com.switchfully.vaadin.ordergui.interfaces.items.Item;
 import com.switchfully.vaadin.ordergui.interfaces.items.ItemResource;
@@ -6,6 +6,9 @@ import com.switchfully.vaadin.ordergui.webapp.OrderGUI;
 import com.switchfully.vaadin.ordergui.webapp.components.TopMenu;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.validator.FloatRangeValidator;
+import com.vaadin.data.validator.IntegerRangeValidator;
+import com.vaadin.data.validator.NullValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
@@ -13,7 +16,11 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import org.springframework.core.annotation.Order;
 
-public class CreateItemView extends CustomComponent implements View {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
+
+public class DetailItemView extends Window implements View, DetailItemViewInterface {
 
     private VerticalLayout mainLayout;
     private Label titleLabel;
@@ -26,9 +33,10 @@ public class CreateItemView extends CustomComponent implements View {
     private BeanFieldGroup<Item> itemBeanFieldGroup;
     private HorizontalLayout createButtons;
     private HorizontalLayout updateButtons;
+    private List<DetailItemViewListener> detailItemViewListeners;
 
-    public CreateItemView(ItemResource itemResource) {
-        this.itemResource = itemResource;
+    public DetailItemView() {
+        detailItemViewListeners = new ArrayList<>();
         titleLabel = createTitle();
         name = createItemName();
         description = createDescription();
@@ -41,7 +49,8 @@ public class CreateItemView extends CustomComponent implements View {
 
         mainLayout = new VerticalLayout(contentLayout);
         mainLayout.setComponentAlignment(contentLayout, Alignment.BOTTOM_CENTER);
-        setCompositionRoot(mainLayout);
+        setContent(mainLayout);
+        enter(null);
     }
 
     private VerticalLayout createContent() {
@@ -65,7 +74,7 @@ public class CreateItemView extends CustomComponent implements View {
         btnCreate.setStyleName(ValoTheme.BUTTON_FRIENDLY);
         btnCreate.setWidth("100px");
         btnCreate.setHeight("50px");
-        Button btnCancel = new Button("Cancel",click->getUI().getNavigator().navigateTo(OrderGUI.VIEW_ORDER_HOME));
+        Button btnCancel = new Button("Cancel",click->this.close()); //getUI().getNavigator().navigateTo(OrderGUI.VIEW_ORDER_HOME));
         btnCancel.setStyleName(ValoTheme.BUTTON_PRIMARY);
         HorizontalLayout buttonLayout = new HorizontalLayout(btnCreate, btnCancel);
         buttonLayout.setSpacing(true);
@@ -89,18 +98,24 @@ public class CreateItemView extends CustomComponent implements View {
     private void save() {
         try {
             itemBeanFieldGroup.commit();
-            itemResource.save(item);
-            getUI().getNavigator().navigateTo(OrderGUI.VIEW_ORDER_HOME);
+            detailItemViewListeners.forEach(listener -> listener.savedButtonClicked(item));
+            //getUI().getNavigator().navigateTo(OrderGUI.VIEW_ORDER_HOME);
+            this.close();
         } catch (FieldGroup.CommitException e) {
-            e.printStackTrace();
+            StringJoiner errorMessages = new StringJoiner("\n");
+            e.getInvalidFields().values()
+                    .forEach(invalidField ->  errorMessages.add(invalidField.getMessage()));
+
+            Notification.show("Validation errors",errorMessages.toString(), Notification.Type.HUMANIZED_MESSAGE);
         }
     }
 
     private void update(){
         try {
             itemBeanFieldGroup.commit();
-            itemResource.update(item);
-            getUI().getNavigator().navigateTo(OrderGUI.VIEW_ORDER_HOME);
+            detailItemViewListeners.forEach(listener -> listener.updateButtonClicked(item));
+            //getUI().getNavigator().navigateTo(OrderGUI.VIEW_ORDER_HOME);
+            this.close();
         } catch (FieldGroup.CommitException e) {
             e.printStackTrace();
         }
@@ -110,6 +125,7 @@ public class CreateItemView extends CustomComponent implements View {
         TextField txtStock = new TextField("Amount of Stock");
         txtStock.setNullRepresentation("0");
         txtStock.setWidth("75px");
+        txtStock.addValidator(new IntegerRangeValidator("Please fill in a correct stock.",0,1000000));
         return txtStock;
     }
 
@@ -118,6 +134,7 @@ public class CreateItemView extends CustomComponent implements View {
         txtPrice.setNullRepresentation("0.00");
         txtPrice.setWidth("75px");
         txtPrice.setIcon(FontAwesome.EURO);
+        txtPrice.addValidator(new FloatRangeValidator("Please fill in a correct price.", 0.01f, 1000000.00f));
         return txtPrice;
     }
 
@@ -126,6 +143,9 @@ public class CreateItemView extends CustomComponent implements View {
         txtDescription.setInputPrompt("Enter your item description...");
         txtDescription.setWidth("85%");
         txtDescription.setHeight("150px");
+        txtDescription.setNullRepresentation("");
+        txtDescription.setRequired(true);
+        txtDescription.setRequiredError("Please fill in the description of the item.");
         return txtDescription;
     }
 
@@ -133,6 +153,9 @@ public class CreateItemView extends CustomComponent implements View {
         TextField txtName = new TextField("Name");
         txtName.setInputPrompt("Enter the name of your item...");
         txtName.setWidth("70%");
+        txtName.setNullRepresentation("");
+        txtName.setRequired(true);
+        txtName.setRequiredError("Please fill in the name of the item.");
         return txtName;
     }
 
@@ -142,7 +165,12 @@ public class CreateItemView extends CustomComponent implements View {
         return titleLabel;
     }
 
-    private void setItem(Item item){
+    @Override
+    public void addListener(DetailItemViewListener detailItemViewListener) {
+        detailItemViewListeners.add(detailItemViewListener);
+    }
+
+    public void setItem(Item item){
         this.item = new Item();
         this.item.setId(item.getId());
         this.item.setName(item.getName());
@@ -154,12 +182,12 @@ public class CreateItemView extends CustomComponent implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        if (event.getParameters().isEmpty()) {
+        if (event==null || event.getParameters().isEmpty()) {
             setItem(new Item());
             createButtons.setVisible(true);
             updateButtons.setVisible(false);
         } else {
-            setItem(itemResource.getItem(event.getParameters()));
+            detailItemViewListeners.forEach(listener -> listener.viewEnteredWithParameters(event.getParameters()));
             updateButtons.setVisible(true);
             createButtons.setVisible(false);
         }
