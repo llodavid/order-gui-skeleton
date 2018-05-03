@@ -48,6 +48,7 @@ public class DetailItemView extends Window implements View, DetailItemViewInterf
         VerticalLayout contentLayout = createContent();
 
         mainLayout = new VerticalLayout(contentLayout);
+        //mainLayout.setHeight("100%");
         mainLayout.setComponentAlignment(contentLayout, Alignment.BOTTOM_CENTER);
         setContent(mainLayout);
         enter(null);
@@ -62,8 +63,9 @@ public class DetailItemView extends Window implements View, DetailItemViewInterf
 
         createButtons = createItemButtons();
         updateButtons = updateItemButtons();
-        VerticalLayout contentLayout = new VerticalLayout(new TopMenu(), titleLabel, nameAndDescriptionLayout, priceAndStockLayout, createButtons, updateButtons);
-        contentLayout.setWidth("60%");
+        VerticalLayout contentLayout = new VerticalLayout(titleLabel, nameAndDescriptionLayout, priceAndStockLayout, createButtons, updateButtons);
+        contentLayout.setWidth("80%");
+        contentLayout.setHeight("90%");
         contentLayout.setComponentAlignment(nameAndDescriptionLayout, Alignment.MIDDLE_LEFT);
         contentLayout.setSpacing(true);
         return contentLayout;
@@ -141,7 +143,7 @@ public class DetailItemView extends Window implements View, DetailItemViewInterf
     private TextArea createDescription() {
         TextArea txtDescription = new TextArea("Description");
         txtDescription.setInputPrompt("Enter your item description...");
-        txtDescription.setWidth("85%");
+        txtDescription.setWidth("100%");
         txtDescription.setHeight("150px");
         txtDescription.setNullRepresentation("");
         txtDescription.setRequired(true);

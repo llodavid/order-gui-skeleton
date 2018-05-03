@@ -9,6 +9,7 @@ import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FileResource;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
@@ -51,6 +52,7 @@ public class SearchItemView extends CustomComponent implements View, SearchItemV
         gridLayout.setWidth("100%");
 
         VerticalLayout titleLayout = new VerticalLayout(addTitleLabel());
+        titleLayout.setMargin(new MarginInfo(true,false,false,false));
         HorizontalLayout filterLayout = new HorizontalLayout(createFilter());
         HorizontalLayout itemButtonLayout = new HorizontalLayout(itemButtonLayout());
         HorizontalLayout topLayout = new HorizontalLayout(filterLayout,itemButtonLayout);
@@ -180,8 +182,8 @@ public class SearchItemView extends CustomComponent implements View, SearchItemV
     @Override
     public void addDetailView(DetailItemView detailItemView) {
         detailItemView.center();
-        detailItemView.setHeight("550px");
-        detailItemView.setWidth("500px");
+        detailItemView.setHeight("475px");
+        detailItemView.setWidth("550px");
         //detailItemView.setContent(detailItemView);
         detailItemView.setModal(true);
         this.detailItemView = detailItemView;

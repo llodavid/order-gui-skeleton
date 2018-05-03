@@ -12,8 +12,6 @@ public class SearchItemPresenter implements SearchItemViewInterface.SearchItemVi
     public SearchItemPresenter(SearchItemViewInterface searchItemViewInterface, SearchItemModel searchItemModel) {
         this.searchItemViewInterface = searchItemViewInterface;
         this.searchItemModel = searchItemModel;
-        searchItemModel.addListener(this);
-        searchItemViewInterface.addListener(this);
     }
 
     @Override
@@ -35,4 +33,5 @@ public class SearchItemPresenter implements SearchItemViewInterface.SearchItemVi
     public void itemResultListUpdated(List<Item> items) {
         searchItemViewInterface.setResultList(items);
     }
+
 }

@@ -19,8 +19,6 @@ public class SearchItemModel {
         searchItemModelListeners = new ArrayList<>();
     }
 
-
-
     public void setSearchFilter(String textToFilter) {
         resultList = itemResource.getItems().stream()
                 .filter(item -> item.getName().toLowerCase().contains(textToFilter.toLowerCase()))

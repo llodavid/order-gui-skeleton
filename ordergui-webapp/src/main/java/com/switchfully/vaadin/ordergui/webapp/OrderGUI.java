@@ -20,7 +20,7 @@ public class OrderGUI extends UI {
 
     public static final String VIEW_ORDER_HOME = "";
     public static final String VIEW_CREATE_ITEM = "detail";
-    public static final String PICTURES_PATH = "C:/Users/7515770/switchfully-repositories/codelabs/vaadin/order-gui/order-gui-skeleton/pictures";
+    public static final String PICTURES_PATH = "C:/switchfully-repositories/order-gui-skeleton/pictures";
 
     private ItemResource itemResource;
     private Navigator navigator;
